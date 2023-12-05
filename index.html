@@ -42,14 +42,14 @@
 
         window.onload = function () {
 
-            
+
             var game = new Core(640, 1280);
-            
+
             moveStageToCenter(game);
             game.fps = 15;
             game.count = 0
 
-            game.preload("new_map.png", "icon0.png", "map0.png", "buttons.png", "up_button.png", "down_button.png", "dig_button.png", "honoo_button.png", "yuki_button.png", "above_button.png", "below_button.png", "left_button.png", "right_button.png", "cross.png","treasure_hunter_bg.jpg","treasure_hunter_title.png");
+            game.preload("new_map.png", "icon0.png", "map0.png", "buttons.png", "up_button.png", "down_button.png", "dig_button.png", "honoo_button.png", "yuki_button.png", "above_button.png", "below_button.png", "left_button.png", "right_button.png", "cross.png", "treasure_hunter_bg.jpg", "treasure_hunter_title.png", "ending_bg.png", "jewel.png","treasure_hunter_main.mp3");
 
 
             game.onload = function () {
@@ -308,9 +308,57 @@
                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                 ];
 
+                game.addjewel = function (jewel_number, scene, jewel_x = null, jewel_y = null) {
+                    var jewel = new Sprite(64, 64)
+                    jewel.scaleX = 0.01
+                    jewel.scaleY = 0.01
+                    jewel.image = game.assets["jewel.png"]
+                    if (jewel_x === null) {
+                        // console.log("null")
+                        jewel.scaleX = 2
+                        jewel.scaleY = 2
+                        jewel.x = jewel_number * 128 + 20
+                        if (jewel_number == 0) {
+                            jewel.y = 1082
+                        } else if (jewel_number == 2) {
+                            jewel.y = 1092
+                        } else {
+                            jewel.y = 1100
+                        }
+                    } else {
+                        jewel.x = jewel_x
+                        jewel.y = jewel_y
+                        jewel.scaleX = 0.1
+                        jewel.scaleY = 0.1
+                    }
+                    jewel.list = [86, 68, 29, 42, 30]//ノーマル86,68,29 レア42 激レア30
+                    jewel.frame = jewel.list[jewel_number]
+                    scene.addChild(jewel);
+                    jewel.n = 0
+                    jewel.addEventListener("enterframe", function () {
+                        if (game.find == 1) {
+                            jewel.n++
+                            if (jewel.scaleX <= 2) {
+                                // if (jewel.n % 5 == 0) {
+                                jewel.scaleX = jewel.scaleX + 0.1
+                                jewel.scaleY = jewel.scaleY + 0.1
+
+                                // }
+                            } else {
+                                game.find = 0
+                                scene.removeChild(slime)
+                                game.replaceScene(createGameoverScene());
+                            }
+                        }
+
+                    })
+                }
+
                 // タイトルシーンを作り、返す関数
                 var createTitleScene = function () {
                     var scene = new Scene();  // 新しいシーンを作る
+
+
 
                     //タイトル画面
                     var bg = new Sprite(1024, 1024)
@@ -322,25 +370,27 @@
                     //ゲーム画面、終了画面
                     var bg2 = new Sprite(401, 118)
                     bg2.image = game.assets["treasure_hunter_title.png"]
-                    bg2.scaleX=1.5
-                    bg2.scaleY=1.5
+                    bg2.scaleX = 1.5
+                    bg2.scaleY = 1.5
                     bg2.x = 100
                     bg2.y = 200
                     scene.addChild(bg2);
 
                     //タイトルのラベル
                     var label = new Label("");
-                    label.font = "16px impact"
+                    label.font = "55px impact"
                     label.color = "white"
                     label.text = "TAP TO START";
-                    label.x = 115
-                    label.y = 160
+                    label.x = 180
+                    label.y = 700
                     scene.addChild(label)
+
 
                     scene.addEventListener(Event.TOUCH_START, function (e) {
                         // シーンにタッチイベントを設定
                         //現在表示しているシーンをゲームシーンに置き換えます
                         game.replaceScene(createGameScene());
+                        // game.replaceScene(createGameoverScene());
                     });
                     // この関数内で作ったシーンを呼び出し元に返します(return)
                     return scene;
@@ -352,22 +402,16 @@
                     var label = new Label('ゲームシーン');        // 新しいラベル(文字)を作る
                     scene.addChild(label);          // シーンにラベルに追加
                     game.count = 0;//スコアを初期化
+                    var bgm = game.assets['treasure_hunter_main.mp3'];
+                    bgm.play();
+                    bgm.src.loop = true;
                     // var bgm = game.assets['bgm1.mp3'];
                     // bgm.play();
                     // bgm.src.loop = true;
                     var activeBackground = 1;
 
 
-                    // var pad = new Pad();
-                    // // var padWidth = 200;
-                    // // var padHeight = 200;
-                    // // // pad.scaleX = 3
-                    // // // pad.scaleY = 3
-                    // // // pad.moveTo((game.width - padWidth) / 2, (game.height - padHeight) / 2); // パッドの位置を設定
-                    // // pad.width = padWidth;
-                    // // pad.height = padHeight;
-                    // pad.x = 120;
-                    // pad.y = 760;
+
                     game.keybind(32, "space");
                     game.keybind(65, "a");
                     game.keybind(81, "q");
@@ -438,15 +482,15 @@
                     // button_a.y = 870;
                     // button_a.scaleX = 6
                     // button_a.scaleY = 6
-                    // game.rootScene.addChild(button_a)
+                    //  scene.addChild(button_a)
+
 
 
                     slime = new Sprite(16, 16);
                     slime.image = game.assets["new_map.png"];
-                    slime.x = 520;
+                    slime.x = 50;
                     slime.y = 50;
-                    // slime.x = 50;
-                    // slime.y = 50;
+
                     slime.frame = 20;
                     slime.scaleX = 2;
                     slime.scaleY = 2;
@@ -462,9 +506,9 @@
 
                     treasure = new Sprite(16, 16);
                     treasure.image = game.assets["map0.png"];
-                    treasure.x = 640
-                    treasure.y = 0
-                    put_treasure()
+                    treasure.x = 200
+                    treasure.y = 50
+                    // put_treasure()
                     treasure.frame = 25;
                     treasure.scaleX = 2;
                     treasure.scaleY = 2;
@@ -487,23 +531,26 @@
                     stick.y = 40
                     stick.rotation = 180
 
+                    game.jewel_number = 0
+                    game.jewel_per = [0.25, 0.25, 0.25, 0.15, 0.10]
 
                     var rectangle = null;
+                    
 
-                    game.rootScene.addChild(backgroundMap1);
-                    // game.rootScene.addChild(button_a)
-                    game.rootScene.addChild(button_z)
-                    game.rootScene.addChild(button_s)
-                    game.rootScene.addChild(button_q)
-                    game.rootScene.addChild(button_w)
-                    game.rootScene.addChild(button_up)
-                    game.rootScene.addChild(button_down)
-                    game.rootScene.addChild(button_right)
-                    game.rootScene.addChild(button_left)
-                    game.rootScene.addChild(slime);
-                    // game.rootScene.addChild(treasure);
-                    game.rootScene.addChild(stick)
-                    // game.rootScene.addChild(pad);
+                    scene.addChild(backgroundMap1);
+                    // scene.addChild(button_a)
+                    scene.addChild(button_z)
+                    scene.addChild(button_s)
+                    scene.addChild(button_q)
+                    scene.addChild(button_w)
+                    scene.addChild(button_up)
+                    scene.addChild(button_down)
+                    scene.addChild(button_right)
+                    scene.addChild(button_left)
+                    scene.addChild(slime);
+                    scene.addChild(treasure);
+                    scene.addChild(stick)
+
 
 
                     slime.count = 0
@@ -521,67 +568,13 @@
                         if (game.input.left) {//左
                             left()
                         }
+                        
                         if (game.input.z && !backgroundMap2.hitTest(this.x + 8, this.y + 8) && activeBackground == 1) {
                             change_z()
                         }
                         if (game.input.a && !backgroundMap1.hitTest(this.x + 8, this.y + 8) && activeBackground == 2) {
                             change_a()
                         }
-
-                        if (this.shikaku_start + 100 < this.time) {
-                            game.rootScene.removeChild(rectangle);
-                            this.shikaku_switch = 0
-                        } else {
-                            this.shikaku_kosa = this.shikaku_kosa - 0.01
-                            rectangle.backgroundColor = ' rgba(245, 191, 86, ' + this.shikaku_kosa + ')';
-
-                        }
-                        this.time++;
-
-                        // console.log("reach:" + reach)
-
-                        var reach = Math.sqrt((this.x - treasure.x) ** 2 + (this.y - treasure.y) ** 2)
-
-                        //杖に当たった時
-                        if (this.within(stick, 32)) {
-                            if (activeBackground == 1) {
-                                console.log(activeBackground)
-                                change_z()
-                            } else if (activeBackground == 2) {
-                                console.log(activeBackground)
-                                change_a()
-                            }
-                            game.rootScene.removeChild(stick)
-                            console.log("杖え")//todo
-                            this.x = stick.x
-                            this.y = stick.y
-                        }
-
-                    });
-
-                    game.addEventListener("enterframe", function () {
-                        var reach = Math.sqrt((slime.x - treasure.x) ** 2 + (slime.y - treasure.y) ** 2)
-                        game.count++
-                        snow.x = Math.sin(game.count * 0.1) * reach + slime.x;
-                        snow.y = Math.cos(game.count * 0.1) * reach + slime.y;
-                        // console.log(game.count)
-                        if (button_w.start + 100 < game.count && button_w.switch == 1) {
-                            game.rootScene.removeChild(snow);
-                            button_w.switch = 0
-                        }
-                        if (game.input.q) {
-                            create_fire()
-                        }
-                        if (game.input.w) {
-                            create_snow()
-                        }
-                        if (game.input.s) {
-                            dig_treasure()
-                        }
-                        if (game.input.space) {
-                            game.rootScene.addChild(treasure)
-                        }
-
                         if (game.up_touched == 1) {
                             up()
                         }
@@ -594,45 +587,98 @@
                         if (game.left_touched == 1) {
                             left()
                         }
+                        if (game.input.q) {
+                            create_fire()
+                        }
+                        if (game.input.w) {
+                            create_snow()
+                        }
+                        if (game.input.s) {
+                            dig_treasure()
+                        }
+                        if (game.input.space) {
+                            scene.addChild(treasure)
+                        }
+
+                        if (this.shikaku_start + 100 < this.time) {
+                            scene.removeChild(rectangle);
+                            this.shikaku_switch = 0
+                        } else {
+                            this.shikaku_kosa = this.shikaku_kosa - 0.01
+                            rectangle.backgroundColor = ' rgba(245, 191, 86, ' + this.shikaku_kosa + ')';
+
+                        }
+                        this.time++;
+
+                        var reach = Math.sqrt((this.x - treasure.x) ** 2 + (this.y - treasure.y) ** 2)
+
+                        //杖に当たった時
+                        if (this.within(stick, 32)) {
+                            if (activeBackground == 1) {
+                                change_z()
+                            } else if (activeBackground == 2) {
+                                change_a()
+                            }
+                            scene.removeChild(stick)
+                            this.x = stick.x
+                            this.y = stick.y
+                        }
+                        var reach = Math.sqrt((slime.x - treasure.x) ** 2 + (slime.y - treasure.y) ** 2)
+                        game.count++
+                        snow.x = Math.sin(game.count * 0.1) * reach + slime.x;
+                        snow.y = Math.cos(game.count * 0.1) * reach + slime.y;
+                        if (button_w.start + 100 < game.count && button_w.switch == 1) {
+                            scene.removeChild(snow);
+                            button_w.switch = 0
+                        }
+                    });
+
+                    game.addEventListener("enterframe", function () {
+
+
+                        // if (game.find == 1) {
+                        //     game.addjewel(game.jewel_number, scene)
+                        // }
+
                     });
 
                     //レイヤーを下げる関数
                     function change_z() {
-                        game.rootScene.removeChild(slime)
-                        game.rootScene.removeChild(stick)
+                        scene.removeChild(slime)
+                        scene.removeChild(stick)
 
-                        game.rootScene.removeChild(backgroundMap1)
-                        game.rootScene.addChild(backgroundMap2);
+                        scene.removeChild(backgroundMap1)
+                        scene.addChild(backgroundMap2);
 
-                        game.rootScene.addChild(slime)
-                        game.rootScene.addChild(stick)
+                        scene.addChild(slime)
+                        scene.addChild(stick)
 
                         stick.x = 40
                         stick.y = 583
                         stick.rotation = 0
 
                         activeBackground = 2;
-                        game.rootScene.removeChild(button_z)
-                        game.rootScene.addChild(button_a)
+                        scene.removeChild(button_z)
+                        scene.addChild(button_a)
                     }
 
                     function change_a() {
-                        game.rootScene.removeChild(slime)
-                        game.rootScene.removeChild(stick)
+                        scene.removeChild(slime)
+                        scene.removeChild(stick)
 
-                        game.rootScene.removeChild(backgroundMap2)
-                        game.rootScene.addChild(backgroundMap1);
+                        scene.removeChild(backgroundMap2)
+                        scene.addChild(backgroundMap1);
 
-                        game.rootScene.addChild(slime)
+                        scene.addChild(slime)
 
-                        game.rootScene.addChild(stick)
+                        scene.addChild(stick)
                         stick.x = 583
                         stick.y = 40
                         stick.rotation = 180
 
                         activeBackground = 1;
-                        game.rootScene.removeChild(button_a)
-                        game.rootScene.addChild(button_z)
+                        scene.removeChild(button_a)
+                        scene.addChild(button_z)
                     }
 
 
@@ -674,9 +720,7 @@
                             slime.frame = 23;
                             slime.count = 0
                         }
-                        // console.log(backgroundMap1.hitTest(slime.x + 16, slime.y + 8) + "," + activeBackground)
                         if (activeBackground == 1 && !backgroundMap1.hitTest(slime.x + 24, slime.y + 16) || activeBackground == 2 && !backgroundMap2.hitTest(slime.x + 24, slime.y + 16)) {
-
                             slime.x = slime.x + 10;
                         }
                     }
@@ -699,9 +743,7 @@
                         if (slime.shikaku_switch == 0) {
                             slime.shikaku_switch = 1
                             slime.shikaku_kosa = 0.5
-                            // console.log("shikaku")
                             var treasure_position = position(slime, treasure)
-                            // console.log(treasure_position)
                             let shiten_x, shiten_y, width_x, width_y
                             switch (treasure_position) {
                                 case "lu":
@@ -734,16 +776,17 @@
                             rectangle.x = shiten_x;
                             rectangle.backgroundColor = ' rgba(245, 191, 86, ' + slime.shikaku_kosa + ')';
                             rectangle.y = shiten_y;
-                            game.rootScene.addChild(rectangle);
+                            scene.addChild(rectangle);
                             slime.shikaku_start = slime.time
                         }
                     }
                     function create_snow() {
                         button_w.start = game.count
-                        game.rootScene.addChild(snow)
-                        // game.rootScene.removeChild(button_w)
+                        scene.addChild(snow)
+                        //  scene.removeChild(button_w)
                         button_w.switch = 1
                     }
+
 
 
                     game.up_touched = 0
@@ -810,19 +853,45 @@
                     });
 
 
+                    game.find = 0
                     //ディグボタンが押されたとき
                     function dig_treasure() {
-                        if (Math.abs(slime.x - treasure.x) <= 24 && Math.abs(slime.y - treasure.y) <= 24) {
-                            console.log("find!!!")
-                            game.rootScene.removeChild(cross)
-                            game.rootScene.addChild(treasure)
+                        if (Math.abs(slime.x - treasure.x) <= 24 && Math.abs(slime.y - treasure.y) <= 24 && game.find == 0) {
+                            game.find = 1
+                            scene.removeChild(cross)
+                            scene.addChild(treasure)
+                            var x = Math.random()
+                            var y = 0
+                            for (let i = 0; i < 5; i++) {
+                                y += game.jewel_per[i]
+                                if (x <= y) {
+                                    game.jewel_number = i
+                                    break;
+                                }
+                            }
+                            save_jewel(game.jewel_number)
+                            game.addjewel(game.jewel_number, scene, treasure.x - 32, treasure.y - 32)
+
                         } else {
-                            console.log("not found...")
                             cross.x = slime.x - 7
                             cross.y = slime.y
-                            game.rootScene.addChild(cross)
+                            scene.addChild(cross)
                         }
+                    }
 
+                    //とった宝石をローカルストレージに保存
+                    function save_jewel(jewel_number) {
+                        var jewel_list = []
+                        var jewel_list_item = localStorage.getItem('jewel_list')
+                        if (jewel_list_item !== null) {
+                            jewel_list = JSON.parse(jewel_list_item)
+
+                        }
+                        if (!jewel_list.includes(jewel_number)) {
+                            jewel_list.push(jewel_number)
+                            localStorage.setItem('jewel_list', JSON.stringify(jewel_list));
+
+                        }
                     }
 
                     //ディグボタンが押されたとき
@@ -851,18 +920,16 @@
                             treasure.y = Math.floor(Math.random() * 550) + 40
                         }
                     }
+                    return scene;
                 };
                 // ゲームオーバーシーンを作り、返す関数
                 var createGameoverScene = function () {
                     var scene = new Scene();                // 新しいシーンを作る
                     // 新しいラベル(文字)を作る
-                    var bg = new Sprite(320, 320)
+                    var bg = new Sprite(1024, 1024)
                     bg.backgroundColor = "rgb(0,200,255)";
-                    bg.image = game.assets["dig_button.png"]
-                    bg.scaleY = 2;
-                    bg.scaleX = 2;
-                    bg.y = 120
-                    bg.x = 0
+                    bg.image = game.assets["ending_bg.png"]
+                    bg.x = -300
                     scene.addChild(bg);
 
                     var label = new Label("");
@@ -872,6 +939,13 @@
                     label.x = 55
                     label.y = 80
                     scene.addChild(label)
+
+                    var jewel_list = JSON.parse(localStorage.getItem('jewel_list'))
+
+                    for (var jewel_number of jewel_list) {
+                        game.addjewel(jewel_number, scene)
+
+                    }
                     // シーンの背景色を設定
                     scene.addEventListener(Event.TOUCH_START, function (e) {
                         // シーンにタッチイベントを設定
