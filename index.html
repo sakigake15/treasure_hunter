@@ -20,6 +20,9 @@
             margin: auto;
         }
     </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -49,7 +52,7 @@
             game.fps = 15;
             game.count = 0
 
-            game.preload("new_map.png", "icon0.png", "map0.png", "buttons.png", "up_button.png", "down_button.png", "dig_button.png", "honoo_button.png", "yuki_button.png", "above_button.png", "below_button.png", "left_button.png", "right_button.png", "cross.png", "treasure_hunter_bg.jpg", "treasure_hunter_title.png", "ending_bg.png", "jewel.png","treasure_hunter_main.mp3");
+            game.preload("new_map.png", "icon0.png", "map0.png", "buttons.png", "up_button.png", "down_button.png", "dig_button.png", "honoo_button.png", "yuki_button.png", "above_button.png", "below_button.png", "left_button.png", "right_button.png", "cross.png", "treasure_hunter_bg.jpg", "treasure_hunter_title.png", "ending_bg.png", "jewel.png", "treasure_hunter_main.mp3");
 
 
             game.onload = function () {
@@ -308,6 +311,7 @@
                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                 ];
 
+
                 game.addjewel = function (jewel_number, scene, jewel_x = null, jewel_y = null) {
                     var jewel = new Sprite(64, 64)
                     jewel.scaleX = 0.01
@@ -325,7 +329,9 @@
                         } else {
                             jewel.y = 1100
                         }
+                        jewel.switch=0
                     } else {
+                        jewel.switch=1
                         jewel.x = jewel_x
                         jewel.y = jewel_y
                         jewel.scaleX = 0.1
@@ -336,7 +342,8 @@
                     scene.addChild(jewel);
                     jewel.n = 0
                     jewel.addEventListener("enterframe", function () {
-                        if (game.find == 1) {
+                        if (game.find == 1&&jewel.switch==1) {
+                            console.log(jewel.scaleX)
                             jewel.n++
                             if (jewel.scaleX <= 2) {
                                 // if (jewel.n % 5 == 0) {
@@ -354,11 +361,24 @@
                     })
                 }
 
+                function jewel_appearance(scene){
+
+                    var jewel_list = JSON.parse(localStorage.getItem('jewel_list'))
+                    console.log(jewel_list)
+                    if (jewel_list!=null){
+                        for (var jewel_number of jewel_list) {
+                            game.addjewel(jewel_number, scene)
+        
+                        }
+
+                    }
+                }
+
                 // タイトルシーンを作り、返す関数
                 var createTitleScene = function () {
                     var scene = new Scene();  // 新しいシーンを作る
 
-
+                    jewel_appearance(scene)
 
                     //タイトル画面
                     var bg = new Sprite(1024, 1024)
@@ -378,13 +398,54 @@
 
                     //タイトルのラベル
                     var label = new Label("");
-                    label.font = "55px impact"
+                    label.font = "55px impacto,impact"
                     label.color = "white"
                     label.text = "TAP TO START";
                     label.x = 180
                     label.y = 700
                     scene.addChild(label)
 
+
+                    scene.addEventListener(Event.TOUCH_START, function (e) {
+                        // シーンにタッチイベントを設定
+                        //現在表示しているシーンをゲームシーンに置き換えます
+                        game.replaceScene(explanationScene());
+                        // game.replaceScene(createGameoverScene());
+                    });
+                    // この関数内で作ったシーンを呼び出し元に返します(return)
+                    return scene;
+                };
+                var explanationScene = function () {
+                    var scene = new Scene();  // 新しいシーンを作る
+
+                    // jewel_appearance(scene)
+                    //タイトルのラベル
+                    var label = new Label("");
+                    label.font = "55px impacto,impact"
+                    label.color = "white"
+                    label.text = "";
+                    label.x = 50
+                    label.width=540
+                    label.y = 200
+                    scene.addChild(label)
+                    var text = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    var label2 = new Label("");
+                    label2.font = "55px impact"
+                    label2.color = "white"
+                    label2.x = 180
+                    label2.y = 700
+                    scene.addChild(label2)
+
+                    var i = 0;
+                    
+                    scene.addEventListener("enterframe",function(){
+                        label.text=text.substring(0,i)
+                        i++
+                        if(text.length+10<i){
+                            label2.text = "TAP TO START";
+                        }
+
+                    })
 
                     scene.addEventListener(Event.TOUCH_START, function (e) {
                         // シーンにタッチイベントを設定
@@ -409,6 +470,8 @@
                     // bgm.play();
                     // bgm.src.loop = true;
                     var activeBackground = 1;
+
+                    jewel_appearance(scene)
 
 
 
@@ -535,7 +598,7 @@
                     game.jewel_per = [0.25, 0.25, 0.25, 0.15, 0.10]
 
                     var rectangle = null;
-                    
+
 
                     scene.addChild(backgroundMap1);
                     // scene.addChild(button_a)
@@ -568,7 +631,7 @@
                         if (game.input.left) {//左
                             left()
                         }
-                        
+
                         if (game.input.z && !backgroundMap2.hitTest(this.x + 8, this.y + 8) && activeBackground == 1) {
                             change_z()
                         }
@@ -940,12 +1003,7 @@
                     label.y = 80
                     scene.addChild(label)
 
-                    var jewel_list = JSON.parse(localStorage.getItem('jewel_list'))
-
-                    for (var jewel_number of jewel_list) {
-                        game.addjewel(jewel_number, scene)
-
-                    }
+                    jewel_appearance(scene)
                     // シーンの背景色を設定
                     scene.addEventListener(Event.TOUCH_START, function (e) {
                         // シーンにタッチイベントを設定
@@ -963,7 +1021,7 @@
             game.start();
         };
 
-        //宿題：シーン追加
+        //宿題：効果音、scene追加（テキストをカタカタするやつ）、テキスト（カタカタするやつ）
 
     </script>
 </body>
