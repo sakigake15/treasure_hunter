@@ -20,9 +20,9 @@
             margin: auto;
         }
     </style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -329,9 +329,9 @@
                         } else {
                             jewel.y = 1100
                         }
-                        jewel.switch=0
+                        jewel.switch = 0
                     } else {
-                        jewel.switch=1
+                        jewel.switch = 1
                         jewel.x = jewel_x
                         jewel.y = jewel_y
                         jewel.scaleX = 0.1
@@ -342,7 +342,7 @@
                     scene.addChild(jewel);
                     jewel.n = 0
                     jewel.addEventListener("enterframe", function () {
-                        if (game.find == 1&&jewel.switch==1) {
+                        if (game.find == 1 && jewel.switch == 1) {
                             console.log(jewel.scaleX)
                             jewel.n++
                             if (jewel.scaleX <= 2) {
@@ -361,14 +361,14 @@
                     })
                 }
 
-                function jewel_appearance(scene){
+                function jewel_appearance(scene) {
 
                     var jewel_list = JSON.parse(localStorage.getItem('jewel_list'))
                     console.log(jewel_list)
-                    if (jewel_list!=null){
+                    if (jewel_list != null) {
                         for (var jewel_number of jewel_list) {
                             game.addjewel(jewel_number, scene)
-        
+
                         }
 
                     }
@@ -398,7 +398,7 @@
 
                     //タイトルのラベル
                     var label = new Label("");
-                    label.font = "55px impacto,impact"
+                    label.font = "55px 'Press Start 2P'"
                     label.color = "white"
                     label.text = "TAP TO START";
                     label.x = 180
@@ -425,7 +425,7 @@
                     label.color = "white"
                     label.text = "";
                     label.x = 50
-                    label.width=540
+                    label.width = 540
                     label.y = 200
                     scene.addChild(label)
                     var text = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -437,11 +437,11 @@
                     scene.addChild(label2)
 
                     var i = 0;
-                    
-                    scene.addEventListener("enterframe",function(){
-                        label.text=text.substring(0,i)
+
+                    scene.addEventListener("enterframe", function () {
+                        label.text = text.substring(0, i)
                         i++
-                        if(text.length+10<i){
+                        if (text.length + 10 < i) {
                             label2.text = "TAP TO START";
                         }
 
@@ -452,6 +452,9 @@
                         //現在表示しているシーンをゲームシーンに置き換えます
                         game.replaceScene(createGameScene());
                         // game.replaceScene(createGameoverScene());
+                        game.load('treasure_hunter_main.mp3', function () {
+                            game.assets['treasure_hunter_main.mp3'].play();
+                        });
                     });
                     // この関数内で作ったシーンを呼び出し元に返します(return)
                     return scene;
@@ -464,7 +467,7 @@
                     scene.addChild(label);          // シーンにラベルに追加
                     game.count = 0;//スコアを初期化
                     var bgm = game.assets['treasure_hunter_main.mp3'];
-                    bgm.play();
+                    // bgm.play();
                     bgm.src.loop = true;
                     // var bgm = game.assets['bgm1.mp3'];
                     // bgm.play();
@@ -611,7 +614,7 @@
                     scene.addChild(button_right)
                     scene.addChild(button_left)
                     scene.addChild(slime);
-                    scene.addChild(treasure);
+                    // scene.addChild(treasure);
                     scene.addChild(stick)
 
 
