@@ -52,7 +52,7 @@
             game.fps = 15;
             game.count = 0
 
-            game.preload("new_map.png", "icon0.png", "map0.png", "buttons.png", "up_button.png", "down_button.png", "dig_button.png", "honoo_button.png", "yuki_button.png", "above_button.png", "below_button.png", "left_button.png", "right_button.png", "cross.png", "treasure_hunter_bg.jpg", "treasure_hunter_title.png", "ending_bg.png", "jewel.png", "treasure_hunter_main.mp3");
+            game.preload("new_map.png", "icon0.png", "map0.png", "buttons.png", "up_button.png", "down_button.png", "dig_button.png", "honoo_button.png", "yuki_button.png", "above_button.png", "below_button.png", "left_button.png", "right_button.png", "cross.png", "treasure_hunter_bg.jpg", "treasure_hunter_title.png", "ending_bg.png", "jewel.png", "treasure_hunter_main.mp3", "find.mp3", "honoo.mp3", "ice.mp3", "text.mp3","dig.mp3");
 
 
             game.onload = function () {
@@ -343,7 +343,6 @@
                     jewel.n = 0
                     jewel.addEventListener("enterframe", function () {
                         if (game.find == 1 && jewel.switch == 1) {
-                            console.log(jewel.scaleX)
                             jewel.n++
                             if (jewel.scaleX <= 2) {
                                 // if (jewel.n % 5 == 0) {
@@ -364,13 +363,11 @@
                 function jewel_appearance(scene) {
 
                     var jewel_list = JSON.parse(localStorage.getItem('jewel_list'))
-                    console.log(jewel_list)
                     if (jewel_list != null) {
                         for (var jewel_number of jewel_list) {
                             game.addjewel(jewel_number, scene)
-
                         }
-
+                        game.jewel_length = jewel_list.length
                     }
                 }
 
@@ -404,8 +401,8 @@
                     label.x = 180
                     label.y = 700
                     scene.addChild(label)
-
-
+                    
+                    
                     scene.addEventListener(Event.TOUCH_START, function (e) {
                         // シーンにタッチイベントを設定
                         //現在表示しているシーンをゲームシーンに置き換えます
@@ -421,39 +418,48 @@
                     // jewel_appearance(scene)
                     //タイトルのラベル
                     var label = new Label("");
-                    label.font = "55px impacto,impact"
+                    label.font = "45px impacto,impact"
                     label.color = "white"
                     label.text = "";
                     label.x = 50
                     label.width = 540
                     label.y = 200
                     scene.addChild(label)
-                    var text = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    var text = "You are a treasure hunter! Find the five different gems in the intricate dungeon! Use snowstorm to know the distance to the gems! Use the flame to narrow down the area where the gems are located! The wand can warp!<br>君はトレジャーハンターだ！入り組んだダンジョンの中から五種類の宝石を探し出そう！吹雪を使うと宝石までの距離がわかるよ！火炎を使うと宝石のある範囲を絞ることができるよ！杖はワープすることができるよ"
                     var label2 = new Label("");
-                    label2.font = "55px impact"
+                    label2.font = "60px impact"
                     label2.color = "white"
+                    label.width = 540
                     label2.x = 180
-                    label2.y = 700
+                    label2.y = 1100
                     scene.addChild(label2)
-
+                    
                     var i = 0;
-
+                    
+                    var bgm_t = game.assets['text.mp3']
+                    var bgm_m = game.assets['treasure_hunter_main.mp3']
                     scene.addEventListener("enterframe", function () {
+                        bgm_t.play()
+                        bgm_t.src.loop = true;
                         label.text = text.substring(0, i)
                         i++
                         if (text.length + 10 < i) {
                             label2.text = "TAP TO START";
+                            bgm_t.stop()
                         }
-
+                        
                     })
 
                     scene.addEventListener(Event.TOUCH_START, function (e) {
+                        // bgm_m.stop()
+                        bgm_t.stop()
                         // シーンにタッチイベントを設定
                         //現在表示しているシーンをゲームシーンに置き換えます
                         game.replaceScene(createGameScene());
                         // game.replaceScene(createGameoverScene());
                         game.load('treasure_hunter_main.mp3', function () {
-                            game.assets['treasure_hunter_main.mp3'].play();
+                            bgm_m.play()
+                            bgm_m.src.loop = true;
                         });
                     });
                     // この関数内で作ったシーンを呼び出し元に返します(return)
@@ -462,13 +468,14 @@
 
                 // ゲームシーンを作り、返す関数
                 var createGameScene = function () {
+
                     var scene = new Scene();        // 新しいシーンを作る
                     var label = new Label('ゲームシーン');        // 新しいラベル(文字)を作る
                     scene.addChild(label);          // シーンにラベルに追加
                     game.count = 0;//スコアを初期化
-                    var bgm = game.assets['treasure_hunter_main.mp3'];
+                    // var bgm = game.assets['treasure_hunter_main.mp3'];
                     // bgm.play();
-                    bgm.src.loop = true;
+                    // bgm.src.loop = true;
                     // var bgm = game.assets['bgm1.mp3'];
                     // bgm.play();
                     // bgm.src.loop = true;
@@ -572,9 +579,9 @@
 
                     treasure = new Sprite(16, 16);
                     treasure.image = game.assets["map0.png"];
-                    treasure.x = 200
-                    treasure.y = 50
-                    // put_treasure()
+                    treasure.x = Math.floor(Math.random() * 550) + 40
+                    treasure.y = Math.floor(Math.random() * 550) + 40
+                    put_treasure()
                     treasure.frame = 25;
                     treasure.scaleX = 2;
                     treasure.scaleY = 2;
@@ -806,6 +813,8 @@
                     }
 
                     function create_fire() {
+                        var bgm_h = game.assets['honoo.mp3']
+                        bgm_h.play()
                         if (slime.shikaku_switch == 0) {
                             slime.shikaku_switch = 1
                             slime.shikaku_kosa = 0.5
@@ -847,6 +856,8 @@
                         }
                     }
                     function create_snow() {
+                        var bgm_y = game.assets['ice.mp3']
+                        bgm_y.play()
                         button_w.start = game.count
                         scene.addChild(snow)
                         //  scene.removeChild(button_w)
@@ -922,6 +933,8 @@
                     game.find = 0
                     //ディグボタンが押されたとき
                     function dig_treasure() {
+                        var bgm_d = game.assets['dig.mp3']
+                        bgm_d.play()
                         if (Math.abs(slime.x - treasure.x) <= 24 && Math.abs(slime.y - treasure.y) <= 24 && game.find == 0) {
                             game.find = 1
                             scene.removeChild(cross)
@@ -1007,6 +1020,7 @@
                     scene.addChild(label)
 
                     jewel_appearance(scene)
+                    console.log(game.jewel_length)
                     // シーンの背景色を設定
                     scene.addEventListener(Event.TOUCH_START, function (e) {
                         // シーンにタッチイベントを設定
