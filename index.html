@@ -451,7 +451,7 @@
                     })
 
                     scene.addEventListener(Event.TOUCH_START, function (e) {
-                        // bgm_m.stop()
+
                         bgm_t.stop()
                         // シーンにタッチイベントを設定
                         //現在表示しているシーンをゲームシーンに置き換えます
@@ -947,6 +947,7 @@
                         var bgm_d = game.assets['dig.mp3']
                         bgm_d.play()
                         if (Math.abs(slime.x - treasure.x) <= 24 && Math.abs(slime.y - treasure.y) <= 24 && game.find == 0) {
+                            bgm_m.stop()
                             game.find = 1
                             scene.removeChild(cross)
                             scene.addChild(treasure)
