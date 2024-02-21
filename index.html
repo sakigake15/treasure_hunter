@@ -361,7 +361,7 @@
                 }
 
                 function jewel_appearance(scene) {
-                    
+
                     var jewel_list = JSON.parse(localStorage.getItem('jewel_list'))
                     if (jewel_list != null) {
                         for (var jewel_number of jewel_list) {
@@ -370,7 +370,7 @@
                         game.jewel_length = jewel_list.length
                     }
                 }
-                
+
                 var bgm_m = game.assets['treasure_hunter_main.mp3']
                 // タイトルシーンを作り、返す関数
                 var createTitleScene = function () {
@@ -946,7 +946,7 @@
                     function dig_treasure() {
                         var bgm_d = game.assets['dig.mp3']
                         bgm_d.play()
-                        if (Math.abs(slime.x - treasure.x) <= 24 && Math.abs(slime.y - treasure.y) <= 24 && game.find == 0) {
+                        if (Math.abs(slime.x - treasure.x) <= 48 && Math.abs(slime.y - treasure.y) <= 48 && game.find == 0) {
                             bgm_m.stop()
                             game.find = 1
                             scene.removeChild(cross)
@@ -1016,8 +1016,10 @@
                 // ゲームオーバーシーンを作り、返す関数
                 var createGameoverScene = function () {
                     var scene = new Scene();                // 新しいシーンを作る
+                    var bgm_find = game.assets['find.mp3']
+                    bgm_find.play()
                     // 新しいラベル(文字)を作る
-                    
+
                     if (game.jewel_length == 5) {
                         var label2 = new Label("");
                         label2.font = "48px impact"
