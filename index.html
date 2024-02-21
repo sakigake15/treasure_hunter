@@ -361,7 +361,7 @@
                 }
 
                 function jewel_appearance(scene) {
-
+                    
                     var jewel_list = JSON.parse(localStorage.getItem('jewel_list'))
                     if (jewel_list != null) {
                         for (var jewel_number of jewel_list) {
@@ -370,7 +370,8 @@
                         game.jewel_length = jewel_list.length
                     }
                 }
-
+                
+                var bgm_m = game.assets['treasure_hunter_main.mp3']
                 // タイトルシーンを作り、返す関数
                 var createTitleScene = function () {
                     var scene = new Scene();  // 新しいシーンを作る
@@ -437,7 +438,6 @@
                     var i = 0;
 
                     var bgm_t = game.assets['text.mp3']
-                    var bgm_m = game.assets['treasure_hunter_main.mp3']
                     scene.addEventListener("enterframe", function () {
                         bgm_t.play()
                         bgm_t.src.loop = true;
@@ -946,7 +946,7 @@
                     function dig_treasure() {
                         var bgm_d = game.assets['dig.mp3']
                         bgm_d.play()
-                        if (Math.abs(slime.x - treasure.x) <= 36 && Math.abs(slime.y - treasure.y) <= 36 && game.find == 0) {
+                        if (Math.abs(slime.x - treasure.x) <= 24 && Math.abs(slime.y - treasure.y) <= 24 && game.find == 0) {
                             bgm_m.stop()
                             game.find = 1
                             scene.removeChild(cross)
